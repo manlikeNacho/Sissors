@@ -5,6 +5,7 @@ import "time"
 type Url struct {
 	ID        string
 	Url       string
+	ShortUrl  string
 	CreatedAt time.Time
 }
 
