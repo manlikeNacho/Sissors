@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"github.com/itchyny/base58-go"
+	"github.com/manlikeNacho/Sissors/src/models"
 	"math/big"
 )
 
@@ -25,12 +26,15 @@ func base58Encoded(bytes []byte) (string, error) {
 }
 
 // GenerateShortLink to generate short Link.
-func GenerateShortLink(initialLink string, userId string) (string, error) {
-	urlHashBytes := sha256Of(initialLink + userId)
-	generatedNumber := new(big.Int).SetBytes(urlHashBytes).Uint64()
-	finalString, err := base58Encoded([]byte(fmt.Sprintf("%d", generatedNumber)))
-	if err != nil {
-		return "", err
+func GenerateShortLink(m models.Url) (string, error) {
+	if m.ShortUrl == "" {
+		urlHashBytes := sha256Of(m.Url)
+		generatedNumber := new(big.Int).SetBytes(urlHashBytes).Uint64()
+		finalString, err := base58Encoded([]byte(fmt.Sprintf("%d", generatedNumber)))
+		if err != nil {
+			return "", err
+		}
+		return finalString[:8], nil
 	}
-	return finalString[:8], nil
+	return m.ShortUrl, nil
 }
