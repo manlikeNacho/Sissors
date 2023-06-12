@@ -1,6 +1,7 @@
 package sliceRepo
 
 import (
+	"fmt"
 	"github.com/manlikeNacho/Sissors/src/models"
 	"github.com/manlikeNacho/Sissors/src/repository"
 	"github.com/redis/go-redis/v9"
@@ -18,6 +19,7 @@ func New() *Db {
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
+	fmt.Println("Initailized Redis database")
 
 	return &Db{
 		Db: rdb,
