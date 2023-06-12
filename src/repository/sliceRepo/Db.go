@@ -29,6 +29,11 @@ func (d Db) SaveUrl(u models.Url) (string, error) {
 	panic("implement me")
 }
 
+func (d Db) GetUrl(u models.Url) (string, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (d Db) DeleteUrl(u models.Url) error {
 	//TODO implement me
 	panic("implement me")
