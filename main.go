@@ -1,10 +1,11 @@
 package main
 
 import (
+	"log"
+
 	"github.com/gin-gonic/gin"
 	"github.com/manlikeNacho/Sissors/src/controller"
 	"github.com/manlikeNacho/Sissors/src/repository/sliceRepo"
-	"log"
 )
 
 func main() {
@@ -18,6 +19,7 @@ func main() {
 		})
 	})
 	r.POST("/Url", ctrl.CreateShortUrl)
+	r.GET("/:short_url", ctrl.GetUrl)
 	if err := r.Run(":8080"); err != nil {
 		log.Printf("Server crashed due to, %v", err)
 	}

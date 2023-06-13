@@ -1,9 +1,10 @@
 package shortener
 
 import (
+	"testing"
+
 	"github.com/manlikeNacho/Sissors/src/models"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 const UserId = "e0dba740-fc4b-4977-872c-d360239e6b1a"
@@ -11,19 +12,19 @@ const UserId = "e0dba740-fc4b-4977-872c-d360239e6b1a"
 func TestShortLinkGenerator(t *testing.T) {
 	type testCases struct {
 		name string
-		url  models.Url
+		url  *models.Url
 		want string
 	}
 
 	test := []testCases{
 		{
 			name: "test_1",
-			url:  models.Url{ID: UserId, Url: "https://www.eddywm.com/lets-build-a-url-shortener-in-go-with-redis-part-2-storage-layer/", ShortUrl: ""},
+			url:  &models.Url{ID: UserId, Url: "https://www.eddywm.com/lets-build-a-url-shortener-in-go-with-redis-part-2-storage-layer/", ShortUrl: ""},
 			want: "hFYku75v",
 		},
 		{
 			name: "test_2",
-			url:  models.Url{ID: UserId, Url: "https://spectrum.ieee.org/automaton/robotics/home-robots/hello-robots-stretch-mobile-manipulator", ShortUrl: ""},
+			url:  &models.Url{ID: UserId, Url: "https://spectrum.ieee.org/automaton/robotics/home-robots/hello-robots-stretch-mobile-manipulator", ShortUrl: ""},
 			want: "AFZXB5Hs",
 		},
 	}

@@ -3,9 +3,10 @@ package shortener
 import (
 	"crypto/sha256"
 	"fmt"
+	"math/big"
+
 	"github.com/itchyny/base58-go"
 	"github.com/manlikeNacho/Sissors/src/models"
-	"math/big"
 )
 
 // sha256Of to hash the initial input of the link, to maintain consistency and uniqueness.
@@ -26,7 +27,7 @@ func base58Encoded(bytes []byte) (string, error) {
 }
 
 // GenerateShortLink to generate short Link.
-func GenerateShortLink(m models.Url) (string, error) {
+func GenerateShortLink(m *models.Url) (string, error) {
 	if m.ShortUrl == "" {
 		urlHashBytes := sha256Of(m.Url)
 		generatedNumber := new(big.Int).SetBytes(urlHashBytes).Uint64()
