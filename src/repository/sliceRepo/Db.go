@@ -4,10 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/manlikeNacho/Sissors/src/models"
 	"github.com/manlikeNacho/Sissors/src/repository"
 	"github.com/redis/go-redis/v9"
-	"time"
 )
 
 var (
@@ -34,20 +35,17 @@ func New() *Db {
 	}
 }
 
-func (d Db) SaveUrl(u models.Url) error {
-	if err := d.Db.Set(ctx, u.Url, u.ShortUrl, CacheDuration).Err(); err != nil {
+func (d Db) SaveUrl(u *models.Url) error {
+	if err := d.Db.Set(ctx, u.ShortUrl, u.Url, CacheDuration).Err(); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (d Db) GetUrl(u models.Url) (string, error) {
-	val, err := d.Db.Get(ctx, u.Url).Result()
-	if err == redis.Nil {
-		return "", errors.New("url not found")
-	}
+func (d Db) GetUrl(s string) (string, error) {
+	val, err := d.Db.Get(ctx, s).Result()
 	if err != nil {
-		return "", err
+		return "", errors.New("url not found")
 	}
 	return val, nil
 }
