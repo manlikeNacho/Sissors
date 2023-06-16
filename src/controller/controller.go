@@ -1,8 +1,9 @@
 package controller
 
 import (
-	"fmt"
+	"log"
 	"net/http"
+	"net/url"
 
 	"github.com/gin-gonic/gin"
 	"github.com/manlikeNacho/Sissors/src/models"
@@ -30,9 +31,15 @@ func (ct Controller) CreateShortUrl(c *gin.Context) {
 		return
 	}
 	//auth url
-	// r, err := url.Parse(userUrl.Url)
+	_, err := url.ParseRequestURI(userUrl.Url)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid URL",
+		})
+		return
+	}
 
-	_, err := ct.repo.GetUrl(userUrl.ShortUrl)
+	_, err = ct.repo.GetUrl(userUrl.ShortUrl)
 	//if err is nil , that means url short key is already saved.
 	if err == nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -53,8 +60,9 @@ func (ct Controller) CreateShortUrl(c *gin.Context) {
 	userUrl.ShortUrl = short_url
 	//save url
 	if err := ct.repo.SaveUrl(userUrl); err != nil {
+		log.Printf("err:%v", err)
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": fmt.Sprintf("An error occured while saving url, %v", err),
+			"error": "an error occured while saving url",
 			"url":   userUrl.Url,
 		})
 		return
@@ -69,9 +77,6 @@ func (ct Controller) CreateShortUrl(c *gin.Context) {
 
 func (ct Controller) GetUrl(c *gin.Context) {
 	p := c.Param("short_url")
-	//auth url
-	// r, err := url.Parse(userUrl.Url)
-
 	val, err := ct.repo.GetUrl(p)
 	//if err is nil , that means url short key is already saved.
 	if err != nil {
