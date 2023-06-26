@@ -31,10 +31,10 @@ func (ct Controller) CreateShortUrl(c *gin.Context) {
 		return
 	}
 	//auth url
-	_, err := url.ParseRequestURI(userUrl.Url)
-	if err != nil {
+	u, err := url.ParseRequestURI(userUrl.Url)
+	if err != nil || u.Scheme != "https" || u.Host == "" || u.Path == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid URL",
+			"error": "invalid URL, provide an absolute URL with a scheme (only https is allowed) and a host (e.g. https://example.com/path/to/resource))",
 		})
 		return
 	}

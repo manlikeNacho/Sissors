@@ -24,7 +24,7 @@ var _ repository.Repository = &Db{}
 
 func New() *Db {
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
+		Addr:     "redisDb:6379",
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
