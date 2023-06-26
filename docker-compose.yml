@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  alt-sch-go:
+    build: . #search for Dockerfile
+    container_name: scissors
+    volumes:
+      - .:/go/src/go-docker
+    ports:
+      - "8080:8080"
+    networks:
+      - scissors
+
+  redis:
+    image: redis/redis-stack:latest
+    #    command:
+    #      - '--character-set-server=utf8mb4'
+    restart: unless-stopped
+    tty: true
+    container_name: redisDb
+    ports:
+      - "6379:6379"
+    volumes:
+      - .:/var/lib
+      - ./redis:/var/lib/
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    networks:
+      - scissors
+
+networks:
+  scissors:
+    external: true
