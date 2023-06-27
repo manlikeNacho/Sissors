@@ -1,0 +1,62 @@
+basePath: /api/v1
+definitions:
+  models.Url:
+    properties:
+      id:
+        type: string
+      shortUrl:
+        type: string
+      url:
+        type: string
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: localhost:8080
+info:
+  contact:
+    email: eiheanacho52@gmail.com
+    name: Iheanacho Emmanuel
+    url: github.com/manlikeNacho
+  description: This is a simple Url-shortener server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Scissors
+  version: "1.0"
+paths:
+  /short_url/:short_url:
+    get:
+      consumes:
+      - application/json
+      description: generates long url and redirects request
+      produces:
+      - application/json
+      responses:
+        "301":
+          description: https:\\google.com
+          schema:
+            type: string
+      summary: Generate long url
+      tags:
+      - Url
+  /url:
+    post:
+      consumes:
+      - application/json
+      description: generates short url and stores old url
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Url'
+      summary: Create short url
+      tags:
+      - Url
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"
