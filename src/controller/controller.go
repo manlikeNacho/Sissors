@@ -21,6 +21,14 @@ func New(repo repository.Repository) Controller {
 	}
 }
 
+// CreateShortUrl godoc
+// @Summary      Create short url
+// @Description  generates short url and stores old url
+// @Tags         Url
+// @Accept       application/json
+// @Produce      application/json
+// @Success       200 {object}  models.Url{}
+// @Router        /url [post]
 func (ct Controller) CreateShortUrl(c *gin.Context) {
 	//Parse request body
 	var userUrl *models.Url
@@ -75,6 +83,14 @@ func (ct Controller) CreateShortUrl(c *gin.Context) {
 	})
 }
 
+// GetUrl godoc
+// @Summary      Generate long url
+// @Description  generates long url and redirects request
+// @Tags         Url
+// @Accept       application/json
+// @Produce      application/json
+// @Success       301 string  "https:\\google.com"
+// @Router        /short_url/:short_url [get]
 func (ct Controller) GetUrl(c *gin.Context) {
 	p := c.Param("short_url")
 	val, err := ct.repo.GetUrl(p)
