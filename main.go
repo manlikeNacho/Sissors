@@ -35,6 +35,13 @@ func main() {
 	//Inittailize db
 	client := sliceRepo.New()
 	ctrl := controller.New(client)
+
+	defer func() {
+		if err := client.Close(); err != nil {
+			log.Fatal(err)
+		}
+	}()
+	
 	r := gin.Default()
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{

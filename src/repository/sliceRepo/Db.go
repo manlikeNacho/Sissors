@@ -3,6 +3,7 @@ package sliceRepo
 import (
 	"context"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
@@ -20,7 +21,8 @@ var (
 )
 
 type Db struct {
-	Db *mongo.Collection
+	Db     *mongo.Collection
+	client *mongo.Client
 }
 
 var _ repository.Repository = &Db{}
@@ -40,8 +42,13 @@ func New() *Db {
 
 	db := client.Database(dbName).Collection(colName)
 	return &Db{
-		Db: db,
+		Db:     db,
+		client: client,
 	}
+}
+
+func (d Db) Close() error {
+	return d.client.Disconnect(ctx)
 }
 
 func (d Db) SaveUrl(u *models.Url) error {
@@ -52,8 +59,20 @@ func (d Db) SaveUrl(u *models.Url) error {
 }
 
 func (d Db) GetUrl(s string) (string, error) {
-	//TODO implement me
-	panic("implement me")
+	filter := bson.D{{Key: "ShortUrl", Value: s}}
+	var result models.Url
+
+	err := d.Db.FindOne(context.TODO(), filter).Decode(&result)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return "", err
+		} else {
+			log.Fatal(err)
+		}
+	}
+
+	fmt.Println("Found document:", result)
+	return result.Url, err
 }
 
 func (d Db) DeleteUrl(u models.Url) error {

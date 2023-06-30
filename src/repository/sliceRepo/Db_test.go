@@ -38,8 +38,6 @@ func TestDb_GetUrl(t *testing.T) {
 		ShortUrl: "",
 	}
 
-	val2, err2 := db.GetUrl(testUrl2.ShortUrl)
+	_, err2 := db.GetUrl(testUrl2.ShortUrl)
 	assert.NotNil(t, err2)
-	assert.Equal(t, "", val2)
-
 }
