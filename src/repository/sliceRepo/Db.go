@@ -3,10 +3,12 @@ package sliceRepo
 import (
 	"context"
 	"fmt"
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
+	"os"
 	"time"
 
 	"github.com/manlikeNacho/Sissors/src/models"
@@ -30,7 +32,16 @@ var _ repository.Repository = &Db{}
 func New() *Db {
 	defer cancel()
 
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb+srv://snipbit:WXNywJUVd0amH2GJ@cluster0.bbfxqpc.mongodb.net/?retryWrites=true&w=majority"))
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	password := os.Getenv("PASSWORD")
+	username := os.Getenv("USER_NAME")
+
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb+srv://"+username+":"+password+"@cluster0.bbfxqpc.mongodb.net/?retryWrites=true&w=majority"))
+
 	if err != nil {
 		log.Fatal(err)
 	}
