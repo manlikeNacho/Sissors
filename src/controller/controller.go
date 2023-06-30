@@ -47,14 +47,14 @@ func (ct Controller) CreateShortUrl(c *gin.Context) {
 		return
 	}
 
-	_, err = ct.repo.GetUrl(userUrl.ShortUrl)
-	//if err is nil , that means url short key is already saved.
-	if err == nil {
+	if _, err = ct.repo.GetUrl(userUrl.ShortUrl); err == nil {
+		log.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "url already exist",
 		})
 		return
 	}
+
 	//generate short url
 	short_url, err := shortener.GenerateShortLink(userUrl)
 	if err != nil {

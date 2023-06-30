@@ -2,11 +2,13 @@ package sliceRepo
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"github.com/redis/go-redis/v9"
+	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
-	"net/url"
+	"os"
 	"time"
 
 	"github.com/manlikeNacho/Sissors/src/models"
@@ -14,68 +16,74 @@ import (
 )
 
 var (
-	ctx           = context.Background()
+	ctx, cancel   = context.WithTimeout(context.TODO(), 10*time.Second)
 	CacheDuration = 6 * time.Hour
+	dbName        = "snipbit"
+	colName       = "url-shortener"
 )
 
 type Db struct {
-	Db *redis.Client
+	Db     *mongo.Collection
+	client *mongo.Client
 }
 
 var _ repository.Repository = &Db{}
 
 func New() *Db {
+	defer cancel()
 
-	// Parse the Redis URL
-	parsedURL, err := url.Parse("rediss://red-cie9ngunqql22egdj1ng:FQbBlx08hh4v42PJlrPnlVvu4txzmiXE@frankfurt-redis.render.com:6379")
+	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatal("Failed to parse Redis URL:", err)
-	}
-	pwd, _ := parsedURL.User.Password()
-	log.Println(parsedURL.Host)
-	log.Println(parsedURL.User.Username())
-	log.Println(pwd)
-
-	// Create a new Redis client
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     parsedURL.Host,
-		Username: parsedURL.User.Username(),
-		Password: pwd,
-	})
-
-	_ = redis.NewClient(&redis.Options{
-		//Addr:     "redisDb:6379",
-		Addr:     "rediss://red-cie9ngunqql22egdj1ng:FQbBlx08hh4v42PJlrPnlVvu4txzmiXE@frankfurt-redis.render.com:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
-	})
-	fmt.Println("Initialized Redis database")
-
-	pong, err := rdb.Ping(ctx).Result()
-	if err != nil {
-		log.Fatal("Failed to connect to Redis:", err)
+		log.Fatal("Error loading .env file")
 	}
 
-	log.Println("Connected to Redis:", pong)
+	password := os.Getenv("PASSWORD")
+	username := os.Getenv("USER_NAME")
 
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb+srv://"+username+":"+password+"@cluster0.bbfxqpc.mongodb.net/?retryWrites=true&w=majority"))
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Mongo connection success")
+
+	if err := client.Ping(ctx, nil); err != nil {
+		log.Fatal(err)
+	}
+
+	db := client.Database(dbName).Collection(colName)
 	return &Db{
-		Db: rdb,
+		Db:     db,
+		client: client,
 	}
 }
 
+func (d Db) Close() error {
+	return d.client.Disconnect(ctx)
+}
+
 func (d Db) SaveUrl(u *models.Url) error {
-	if err := d.Db.Set(ctx, u.ShortUrl, u.Url, CacheDuration).Err(); err != nil {
+	if _, err := d.Db.InsertOne(context.Background(), u); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (d Db) GetUrl(s string) (string, error) {
-	val, err := d.Db.Get(ctx, s).Result()
+	filter := bson.D{{Key: "ShortUrl", Value: s}}
+	var result models.Url
+
+	err := d.Db.FindOne(context.TODO(), filter).Decode(&result)
 	if err != nil {
-		return "", errors.New("url not found")
+		if err == mongo.ErrNoDocuments {
+			return "", err
+		} else {
+			log.Fatal(err)
+		}
 	}
-	return val, nil
+
+	fmt.Println("Found document:", result)
+	return result.Url, err
 }
 
 func (d Db) DeleteUrl(u models.Url) error {

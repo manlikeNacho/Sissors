@@ -29,7 +29,7 @@ func base58Encoded(bytes []byte) (string, error) {
 // GenerateShortLink to generate short Link.
 func GenerateShortLink(m *models.Url) (string, error) {
 	if m.ShortUrl == "" {
-		urlHashBytes := sha256Of(m.Url)
+		urlHashBytes := sha256Of(m.Url + m.ID)
 		generatedNumber := new(big.Int).SetBytes(urlHashBytes).Uint64()
 		finalString, err := base58Encoded([]byte(fmt.Sprintf("%d", generatedNumber)))
 		if err != nil {
