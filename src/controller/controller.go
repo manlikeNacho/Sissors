@@ -47,6 +47,19 @@ func (ct Controller) CreateShortUrl(c *gin.Context) {
 		return
 	}
 
+	//generate and update short_url
+	if userUrl.ShortUrl == "" {
+		short_url, err := shortener.GenerateShortLink(userUrl)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "an error occured while encoding url",
+			})
+			return
+		}
+		userUrl.ShortUrl = short_url
+	}
+
+	//Check db for short_url
 	if _, err = ct.repo.GetUrl(userUrl.ShortUrl); err == nil {
 		log.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -55,18 +68,7 @@ func (ct Controller) CreateShortUrl(c *gin.Context) {
 		return
 	}
 
-	//generate short url
-	short_url, err := shortener.GenerateShortLink(userUrl)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "an error occured while encoding url",
-		})
-		return
-	}
-
-	//Update userUrl
-	userUrl.ShortUrl = short_url
-	//save url
+	//save url in db
 	if err := ct.repo.SaveUrl(userUrl); err != nil {
 		log.Printf("err:%v", err)
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -75,6 +77,7 @@ func (ct Controller) CreateShortUrl(c *gin.Context) {
 		})
 		return
 	}
+
 	//return
 	c.JSON(http.StatusOK, gin.H{
 		"message":     "short url created",
