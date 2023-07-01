@@ -3,16 +3,15 @@ package sliceRepo
 import (
 	"context"
 	"fmt"
+	"log"
+	"time"
+
 	"github.com/joho/godotenv"
+	"github.com/manlikeNacho/Sissors/src/models"
+	"github.com/manlikeNacho/Sissors/src/repository"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
-	"os"
-	"time"
-
-	"github.com/manlikeNacho/Sissors/src/models"
-	"github.com/manlikeNacho/Sissors/src/repository"
 )
 
 var (
@@ -20,6 +19,8 @@ var (
 	CacheDuration = 6 * time.Hour
 	dbName        = "snipbit"
 	colName       = "url-shortener"
+	password      = "GHPDB2SlSSf99ElA"
+	username      = "snipbit"
 )
 
 type Db struct {
@@ -34,11 +35,8 @@ func New() *Db {
 
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Println("Error loading .env file")
 	}
-
-	password := os.Getenv("PASSWORD")
-	username := os.Getenv("USER_NAME")
 
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb+srv://"+username+":"+password+"@cluster0.bbfxqpc.mongodb.net/?retryWrites=true&w=majority"))
 
