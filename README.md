@@ -47,7 +47,7 @@ Contributions are welcome! Please read our contributing guidelines for more info
 
 If you like Sissors and want to support its development, you can donate to us using the following methods:
 
-- [Buy me a coffee](https://www.buymeacoffee.com/)
+- [Buy me a coffee](https://bmc.link/nachoooo)
 - [Other donation method]
 
 ## License
