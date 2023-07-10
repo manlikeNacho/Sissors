@@ -3,7 +3,7 @@ URL shortener using Go
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/manlikeNacho/Dice/blob/main/LICENSE)
 
-A Url shortener in Go using Redis and Gin Framework.
+A Url shortener in Go using MongoDb and Gin Framework.
 
 ## Table of Contents
 
@@ -52,5 +52,5 @@ If you like Sissors and want to support its development, you can donate to us us
 
 ## License
 
-B.O.B is licensed under the MIT License.
+Sissors is licensed under the MIT License.
 
