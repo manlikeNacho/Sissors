@@ -88,3 +88,11 @@ func (d Db) DeleteUrl(u models.Url) error {
 	//TODO implement me
 	panic("implement me")
 }
+
+func (d Db) SaveUser(u models.User) error {
+	if _, err := d.Db.InsertOne(ctx, u); err != nil {
+		return err
+	}
+
+	return nil
+}

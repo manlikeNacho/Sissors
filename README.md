@@ -14,7 +14,7 @@ A Url shortener in Go using Redis and Gin Framework.
 
 ## Introduction
 
-Sissors is a lightweight application that allows you to shorten url and retrieve them at a very fast rate.
+[Sissors ]()is a lightweight application that allows you to shorten url and retrieve them at a very fast rate.
 
 ## Features
 
