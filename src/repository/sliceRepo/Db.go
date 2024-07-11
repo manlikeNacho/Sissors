@@ -45,9 +45,9 @@ func New() *Db {
 	}
 	fmt.Println("Mongo connection success")
 
-	if err := client.Ping(ctx, nil); err != nil {
-		log.Fatal(err)
-	}
+	// if err := client.Ping(ctx, nil); err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	db := client.Database(dbName).Collection(colName)
 	return &Db{

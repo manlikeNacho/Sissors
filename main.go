@@ -1,14 +1,16 @@
 package main
 
 import (
+	"log"
+
 	"github.com/manlikeNacho/Sissors/docs"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"log"
 
 	"github.com/gin-gonic/gin"
 	"github.com/manlikeNacho/Sissors/src/controller"
 	"github.com/manlikeNacho/Sissors/src/repository/sliceRepo"
+	"github.com/manlikeNacho/Sissors/src/routes"
 )
 
 // @title           Scissors
@@ -41,11 +43,14 @@ func main() {
 			log.Fatal(err)
 		}
 	}()
-	
+
 	r := gin.Default()
-	r.GET("/", func(c *gin.Context) {
+	r.Use(gin.Logger())
+	routes.UserRoutes(r)
+	routes.AuthRoutes(r)
+	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
-			"message": "Welcome to my url shortener",
+			"message": "pong",
 		})
 	})
 	docs.SwaggerInfo.BasePath = "/api/v1"
