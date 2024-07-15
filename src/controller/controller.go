@@ -21,6 +21,28 @@ func New(repo repository.Repository) Controller {
 	}
 }
 
+func (ct Controller) Signup(c *gin.Context) {
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "signUp",
+	})
+}
+
+func (ct Controller) Login(c *gin.Context) {
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Login",
+	})
+}
+
+func (ct Controller) GetUserById(c *gin.Context) {
+	userId := c.Param("user_id")
+	c.JSON(http.StatusOK, gin.H{
+		"message": "user by Id...",
+		"user_id": userId,
+	})
+}
+
 // CreateShortUrl godoc
 // @Summary      Create short url
 // @Description  generates short url and stores old url

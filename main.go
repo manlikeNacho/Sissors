@@ -3,14 +3,13 @@ package main
 import (
 	"log"
 
-	"github.com/manlikeNacho/Sissors/docs"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
-
 	"github.com/gin-gonic/gin"
+	"github.com/manlikeNacho/Sissors/docs"
 	"github.com/manlikeNacho/Sissors/src/controller"
 	"github.com/manlikeNacho/Sissors/src/repository/sliceRepo"
 	"github.com/manlikeNacho/Sissors/src/routes"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // @title           Scissors
@@ -33,10 +32,28 @@ import (
 // @externalDocs.description  OpenAPI
 // @externalDocs.url          https://swagger.io/resources/open-api/
 
+func inject(d *sliceRepo.Db) (*gin.Engine, error) {
+	//Initailize db collections
+	sliceRepo.TokenRepo.InitializeTokenDB(d.Db, "snipbit", "token")
+	sliceRepo.UrlRepo.InitializeUrlDB(d.Db, "snipbit", "url")
+	router := gin.Default()
+
+	ctrl := controller.New(d)
+	routes.AuthRoutes(router, &ctrl)
+	routes.UrlRoutes(router, &ctrl)
+	routes.UserRoutes(router, &ctrl)
+	return router, nil
+}
+
 func main() {
-	//Inittailize db
+	// Initialize db
 	client := sliceRepo.New()
-	ctrl := controller.New(client)
+
+	// Inject db instance into controllers and routers
+	r, err1 := inject(client)
+	if err1 != nil {
+		log.Fatal(err1)
+	}
 
 	defer func() {
 		if err := client.Close(); err != nil {
@@ -44,10 +61,7 @@ func main() {
 		}
 	}()
 
-	r := gin.Default()
 	r.Use(gin.Logger())
-	routes.UserRoutes(r)
-	routes.AuthRoutes(r)
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",
@@ -55,8 +69,6 @@ func main() {
 	})
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	r.POST("/url", ctrl.CreateShortUrl)
-	r.GET("short_url/:short_url", ctrl.GetUrl)
 	if err := r.Run(":8080"); err != nil {
 		log.Printf("Server crashed due to, %v", err)
 	}
