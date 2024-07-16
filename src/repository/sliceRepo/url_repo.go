@@ -36,6 +36,7 @@ func (d *urlDBRepository) initUrlCollection() *mongo.Collection {
 	return d.client.Database(d.dbName).Collection(d.urlCollection)
 }
 
+// SaveUrl save url in db collection.
 func (d *urlDBRepository) SaveUrl(u *models.Url) error {
 	if _, err := d.initUrlCollection().InsertOne(context.Background(), u); err != nil {
 		return err
@@ -43,6 +44,7 @@ func (d *urlDBRepository) SaveUrl(u *models.Url) error {
 	return nil
 }
 
+// GetUrl get url from db collection using hashed url.
 func (d *urlDBRepository) GetUrl(urlString string) (string, error) {
 	filter := bson.D{{Key: "ShortUrl", Value: urlString}}
 	var result models.Url
@@ -60,6 +62,7 @@ func (d *urlDBRepository) GetUrl(urlString string) (string, error) {
 	return result.Url, err
 }
 
+// delete url from using url id
 func (d *urlDBRepository) DeleteUrl(urlID string) error {
 	filter := bson.D{{Key: "Url", Value: urlID}}
 	_, err := d.initUrlCollection().DeleteOne(context.TODO(), filter)

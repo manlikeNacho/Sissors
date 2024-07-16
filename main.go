@@ -38,7 +38,7 @@ func inject(d *sliceRepo.Db) (*gin.Engine, error) {
 	sliceRepo.UrlRepo.InitializeUrlDB(d.Db, "snipbit", "url")
 	router := gin.Default()
 
-	ctrl := controller.New(d)
+	ctrl := controller.New()
 	routes.AuthRoutes(router, &ctrl)
 	routes.UrlRoutes(router, &ctrl)
 	routes.UserRoutes(router, &ctrl)
@@ -50,9 +50,9 @@ func main() {
 	client := sliceRepo.New()
 
 	// Inject db instance into controllers and routers
-	r, err1 := inject(client)
-	if err1 != nil {
-		log.Fatal(err1)
+	r, err := inject(client)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	defer func() {

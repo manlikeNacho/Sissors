@@ -6,7 +6,6 @@ import (
 )
 
 func UrlRoutes(router *gin.Engine, ctrl *controller.Controller) {
-	// panic("Implement me")
 	router.POST("/url", ctrl.CreateShortUrl)
 	router.GET("short_url/:short_url", ctrl.GetUrl)
 }

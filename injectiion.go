@@ -10,7 +10,7 @@ import (
 func Inject(d *sliceRepo.Db) (*gin.Engine, error) {
 	router := gin.Default()
 
-	ctrl := controller.New(d)
+	ctrl := controller.New()
 	routes.AuthRoutes(router, &ctrl)
 	routes.UrlRoutes(router, &ctrl)
 	routes.UserRoutes(router, &ctrl)

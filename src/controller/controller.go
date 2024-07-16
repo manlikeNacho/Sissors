@@ -8,17 +8,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/manlikeNacho/Sissors/src/models"
 	"github.com/manlikeNacho/Sissors/src/pkg/shortener"
-	"github.com/manlikeNacho/Sissors/src/repository"
+	"github.com/manlikeNacho/Sissors/src/repository/sliceRepo"
 )
 
 type Controller struct {
-	repo repository.Repository
 }
 
-func New(repo repository.Repository) Controller {
-	return Controller{
-		repo: repo,
-	}
+func New() Controller {
+	return Controller{}
 }
 
 func (ct Controller) Signup(c *gin.Context) {
@@ -82,7 +79,7 @@ func (ct Controller) CreateShortUrl(c *gin.Context) {
 	}
 
 	//Check db for short_url
-	if _, err = ct.repo.GetUrl(userUrl.ShortUrl); err == nil {
+	if _, err = sliceRepo.UrlRepo.GetUrl(userUrl.ShortUrl); err == nil {
 		log.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "url already exist",
@@ -91,7 +88,7 @@ func (ct Controller) CreateShortUrl(c *gin.Context) {
 	}
 
 	//save url in db
-	if err := ct.repo.SaveUrl(userUrl); err != nil {
+	if err := sliceRepo.UrlRepo.SaveUrl(userUrl); err != nil {
 		log.Printf("err:%v", err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "an error occured while saving url",
@@ -118,7 +115,7 @@ func (ct Controller) CreateShortUrl(c *gin.Context) {
 // @Router        /short_url/:short_url [get]
 func (ct Controller) GetUrl(c *gin.Context) {
 	p := c.Param("short_url")
-	val, err := ct.repo.GetUrl(p)
+	val, err := sliceRepo.UrlRepo.GetUrl(p)
 	//if err is nil , that means url short key is already saved.
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
