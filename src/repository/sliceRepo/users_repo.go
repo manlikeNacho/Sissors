@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/manlikeNacho/Sissors/src/models"
+	"github.com/manlikeNacho/Sissors/src/utils"
 	"github.com/manlikeNacho/Sissors/src/utils/rerrors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -18,7 +19,7 @@ type UsersDBRepository interface {
 	CheckUserExistsByEmail(email string) bool
 	GetAllUsers() ([]models.User, error)
 	UpdateUser(user *models.User) error
-	// GetUserDataByID(userId string) (*models.User, error)
+	InitailizeUserDb(db *mongo.Client, dbName, usersCollection string)
 }
 
 type userRepository struct {
@@ -35,12 +36,38 @@ func (u *userRepository) InitailizeUserDb(db *mongo.Client, dbName, usersCollect
 	u.usersCollection = usersCollection
 }
 
+func (u *userRepository) collection() *mongo.Collection {
+	return u.client.Database(u.dbName).Collection(u.usersCollection)
+}
+
+func (u *userRepository) SaveUser(user *models.User) (*models.User, error) {
+	//Hash password
+	password, err := utils.HashPasswords(user)
+	if err != nil {
+		return nil, err
+	}
+	//map user
+	newUser := &models.User{
+		First_name: user.First_name,
+		Last_name:  user.Last_name,
+		Password:   password,
+		Phone:      user.Phone,
+		User_type:  user.User_type,
+		Created_at: time.Now().Unix(),
+		Updated_at: time.Now().Unix(),
+	}
+	//save to db
+	_, err = u.collection().InsertOne(context.Background(), newUser)
+	//return user or error
+	return user, nil
+}
+
 func (u *userRepository) GetUserByID(userId string) (*models.User, error) {
 	user := &models.User{}
 	query := bson.M{
 		"id": userId,
 	}
-	if err := u.client.Database(u.dbName).Collection(u.usersCollection).FindOne(context.Background(), query).Decode(user); err != nil {
+	if err := u.collection().FindOne(context.Background(), query).Decode(user); err != nil {
 		return nil, rerrors.Format(rerrors.NotFoundErr, errors.New("invalid user ID"))
 	}
 
@@ -52,7 +79,7 @@ func (u *userRepository) GetUserByEmail(email string) (*models.User, error) {
 	query := bson.M{
 		"email": email,
 	}
-	if err := u.client.Database(u.dbName).Collection(u.usersCollection).FindOne(context.Background(), query).Decode(user); err != nil {
+	if err := u.collection().FindOne(context.Background(), query).Decode(user); err != nil {
 		return nil, rerrors.Format(rerrors.NotFoundErr, errors.New("invalid user ID"))
 	}
 
@@ -64,7 +91,7 @@ func (u *userRepository) CheckUserExistsByEmail(email string) bool {
 		"email": email,
 	}
 
-	collection := u.client.Database(u.dbName).Collection(u.usersCollection)
+	collection := u.collection()
 	count, err := collection.CountDocuments(context.Background(), query)
 	if err != nil {
 		return false
@@ -83,7 +110,7 @@ func (u *userRepository) GetAllUsers() ([]models.User, error) {
 	query := bson.M{}
 	opts := options.Find()
 	opts.SetSort(bson.D{{Key: "created_at", Value: -1}})
-	collection := u.client.Database(u.dbName).Collection(u.usersCollection)
+	collection := u.collection()
 	cursor, err := collection.Find(context.Background(), query, opts)
 	if err != nil {
 		return nil, rerrors.Format(rerrors.InternalErr, err)
@@ -115,7 +142,7 @@ func (u *userRepository) UpdateUser(user *models.User) error {
 		},
 	}
 
-	collection := u.client.Database(u.dbName).Collection(u.usersCollection)
+	collection := u.collection()
 	result, err := collection.UpdateOne(context.Background(), filter, updateQuery)
 	if err != nil {
 		return rerrors.Format(rerrors.InternalErr, err)

@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"log"
 	"net/http"
 	"net/url"
@@ -9,6 +10,7 @@ import (
 	"github.com/manlikeNacho/Sissors/src/models"
 	"github.com/manlikeNacho/Sissors/src/pkg/shortener"
 	"github.com/manlikeNacho/Sissors/src/repository/sliceRepo"
+	"github.com/manlikeNacho/Sissors/src/utils/rerrors"
 )
 
 type Controller struct {
@@ -19,6 +21,38 @@ func New() Controller {
 }
 
 func (ct Controller) Signup(c *gin.Context) {
+	//parse request body
+	var user models.SignupReq
+	err := c.ShouldBindJSON(&user)
+	if err != nil {
+		err := rerrors.Format(rerrors.UnproccessibleEntityErr, err)
+		errCode := err.(*rerrors.Err).Status()
+		c.JSON(errCode, gin.H{
+			"error": err,
+		})
+		return
+	}
+
+	err = user.ValidateUser()
+	if err != nil {
+		errCode := err.(*rerrors.Err).Status()
+		c.JSON(errCode, gin.H{
+			"error": err,
+		})
+		return
+	}
+
+	// checks if email already exist and returns a boolean
+	if !sliceRepo.UserRepo.CheckUserExistsByEmail(user.Email) {
+		err := rerrors.Format(rerrors.BadRequestErr, errors.New("email or phone_number already exist"))
+		errCode := err.(*rerrors.Err).Status()
+		c.JSON(errCode, gin.H{
+			"error": err,
+		})
+		return
+	}
+
+	// res, err := sliceRepo.UserRepo.
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "signUp",

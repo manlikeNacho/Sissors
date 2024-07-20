@@ -34,6 +34,7 @@ import (
 
 func inject(d *sliceRepo.Db) (*gin.Engine, error) {
 	//Initailize db collections
+	sliceRepo.UserRepo.InitailizeUserDb(d.Db, "snipbit", "user")
 	sliceRepo.TokenRepo.InitializeTokenDB(d.Db, "snipbit", "token")
 	sliceRepo.UrlRepo.InitializeUrlDB(d.Db, "snipbit", "url")
 	router := gin.Default()
