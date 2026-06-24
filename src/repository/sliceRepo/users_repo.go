@@ -19,6 +19,7 @@ type UsersDBRepository interface {
 	CheckUserExistsByEmail(email string) bool
 	GetAllUsers() ([]models.User, error)
 	UpdateUser(user *models.User) error
+	SaveUser(user *models.SignupReq) (*models.User, error)
 	InitailizeUserDb(db *mongo.Client, dbName, usersCollection string)
 }
 
@@ -40,7 +41,7 @@ func (u *userRepository) collection() *mongo.Collection {
 	return u.client.Database(u.dbName).Collection(u.usersCollection)
 }
 
-func (u *userRepository) SaveUser(user *models.User) (*models.User, error) {
+func (u *userRepository) SaveUser(user *models.SignupReq) (*models.User, error) {
 	//Hash password
 	password, err := utils.HashPasswords(user)
 	if err != nil {
@@ -59,7 +60,7 @@ func (u *userRepository) SaveUser(user *models.User) (*models.User, error) {
 	//save to db
 	_, err = u.collection().InsertOne(context.Background(), newUser)
 	//return user or error
-	return user, nil
+	return newUser, nil
 }
 
 func (u *userRepository) GetUserByID(userId string) (*models.User, error) {

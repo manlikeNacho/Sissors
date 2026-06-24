@@ -5,7 +5,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func HashPasswords(u *models.User) (string, error) {
+func HashPasswords(u *models.SignupReq) (string, error) {
 	// Hash passwords using bcrypt
 	hash, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 

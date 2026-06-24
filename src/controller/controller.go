@@ -52,7 +52,7 @@ func (ct Controller) Signup(c *gin.Context) {
 		return
 	}
 
-	// res, err := sliceRepo.UserRepo.
+	_, err = sliceRepo.UserRepo.SaveUser(&user)
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "signUp",

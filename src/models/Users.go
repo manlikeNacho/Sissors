@@ -23,9 +23,10 @@ type User struct {
 type SignupReq struct {
 	First_name string `json:"first_name"`
 	Last_name  string `json:"last_name"`
-	Phone      string `json:"phone"`
+	Phone      int    `json:"phone"`
 	Email      string `json:"email"`
 	Password   string `json:"password"`
+	User_type  string `json:"user_type"`
 }
 
 func (u *SignupReq) ValidateUser() error {
