@@ -20,7 +20,9 @@ func (e *Err) Error() string {
 	return string(b)
 }
 
-func (e *Err) format()
+// func (e *Err) format() string {
+// 	return ""
+// }
 
 func NewError(code int, message, detail string) error {
 	return &Err{

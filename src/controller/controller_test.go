@@ -1,14 +1,15 @@
 package controller
 
 import (
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/manlikeNacho/Sissors/src/models"
 	"github.com/manlikeNacho/Sissors/src/repository/mocks"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"net/http/httptest"
-	"testing"
 )
 
 func TestController_CreateShortUrl(t *testing.T) {
@@ -17,7 +18,7 @@ func TestController_CreateShortUrl(t *testing.T) {
 	controllers := gomock.NewController(t)
 	defer controllers.Finish()
 	mockRepo := mocks.NewMockRepository(controllers)
-	ctrl := New(mockRepo)
+	ctrl := New()
 	testUrl := &models.Url{
 		ID:       "sum",
 		Url:      "google.com",
@@ -40,7 +41,7 @@ func TestController_GetUrl(t *testing.T) {
 	controllers := gomock.NewController(t)
 	defer controllers.Finish()
 	mockRepo := mocks.NewMockRepository(controllers)
-	ctrl := New(mockRepo)
+	ctrl := New()
 	testUrl := &models.Url{
 		ID:       "sum",
 		Url:      "google.com",
