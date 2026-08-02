@@ -68,6 +68,8 @@ func main() {
 			"message": "pong",
 		})
 	})
+	r.StaticFile("/", "./public/index.html")
+	r.Static("/assets", "./public/assets")
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	if err := r.Run(":8080"); err != nil {
